@@ -51,7 +51,6 @@ class YouTrackMCPServer:
         self.server = ToolServerBase(
             name=config.MCP_SERVER_NAME,
             instructions=config.MCP_SERVER_DESCRIPTION,
-            transport=transport,  # ToolServerBase expects 'transport' parameter
         )
 
         # Initialize tool registry
@@ -872,7 +871,7 @@ class YouTrackMCPServer:
         logger.info(
             f"Starting YouTrack MCP server ({config.MCP_SERVER_NAME}) with {self.transport_mode} transport"
         )
-        self.server.run()
+        self.server.run(transport=self.transport_mode)
 
     def register_loaded_tools(self, loaded_tools: Dict[str, Callable]) -> None:
         """

@@ -39,6 +39,36 @@ TOOL_PRIORITY = {
     },
 }
 
+# Tools to disable (remove from list to re-enable)
+# Note: get_custom_fields is disabled but ProjectTools version will still work
+# due to priority system (ProjectTools has priority 100)
+DISABLED_TOOLS = {
+    # User request
+    "update_issue_assignee",
+    "get_available_custom_field_values",
+    "update_issue_estimation",
+    "update_custom_fields",
+    # Rarely needed
+    "get_issue_raw",
+    "get_attachment_content",
+    "diagnose_workflow_restrictions",
+    "get_help",
+    "create_subsystem",
+    "create_version",
+    "create_build",
+    "validate_custom_field",
+    "get_custom_field_schema",
+    "get_all_custom_fields_schemas",
+    # MCP Resources (internal)
+    "list_resources",
+    "read_resource",
+    "subscribe_resource",
+    "unsubscribe_resource",
+    "get_all_projects",
+    "get_all_issues",
+    "get_all_users",
+}
+
 
 def load_all_tools() -> Dict[str, Callable]:
     """
@@ -122,6 +152,10 @@ def load_all_tools() -> Dict[str, Callable]:
             if name in ["close", "get_tool_definitions"]:
                 continue
 
+            # Skip disabled tools
+            if name in DISABLED_TOOLS:
+                continue
+
             # Track where the tool came from
             if name in tool_sources:
                 tool_sources[name].append(class_name)
@@ -158,6 +192,10 @@ def load_all_tools() -> Dict[str, Callable]:
 
     # Process tools with duplicates first, using the highest priority version
     for name, priorities in tool_priorities.items():
+        # Skip disabled tools
+        if name in DISABLED_TOOLS:
+            continue
+
         if len(priorities) > 1:
             # Sort by priority (highest first)
             sorted_priorities = sorted(
@@ -195,6 +233,10 @@ def load_all_tools() -> Dict[str, Callable]:
                 name in ["close", "get_tool_definitions"]
                 or name in registered_tools
             ):
+                continue
+
+            # Skip disabled tools
+            if name in DISABLED_TOOLS:
                 continue
 
             # Create a properly bound wrapper for the method
